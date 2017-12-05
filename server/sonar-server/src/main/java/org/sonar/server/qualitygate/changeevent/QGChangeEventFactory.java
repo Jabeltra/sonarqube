@@ -22,75 +22,10 @@ package org.sonar.server.qualitygate.changeevent;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import javax.annotation.Nullable;
-import org.sonar.api.rules.RuleType;
 import org.sonar.core.issue.DefaultIssue;
-import org.sonar.core.issue.IssueChangeContext;
 import org.sonar.db.component.ComponentDto;
-import org.sonar.server.issue.ws.SearchResponseData;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 public interface QGChangeEventFactory {
-  /**
-   * Will call webhooks once for any short living branch which has at least one issue in {@link SearchResponseData} and
-   * if change described in {@link IssueChange} can alter the status of the short living branch.
-   */
-  List<QGChangeEvent> from(IssueChangeData issueChangeData, IssueChange issueChange, IssueChangeContext context);
-
-  final class IssueChange {
-    private final RuleType ruleType;
-    private final String transitionKey;
-
-    public IssueChange(RuleType ruleType) {
-      this(ruleType, null);
-    }
-
-    public IssueChange(String transitionKey) {
-      this(null, transitionKey);
-    }
-
-    public IssueChange(@Nullable RuleType ruleType, @Nullable String transitionKey) {
-      checkArgument(ruleType != null || transitionKey != null, "At least one of ruleType and transitionKey must be non null");
-      this.ruleType = ruleType;
-      this.transitionKey = transitionKey;
-    }
-
-    public Optional<RuleType> getRuleType() {
-      return Optional.ofNullable(ruleType);
-    }
-
-    public Optional<String> getTransitionKey() {
-      return Optional.ofNullable(transitionKey);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-        return false;
-      }
-      IssueChange that = (IssueChange) o;
-      return ruleType == that.ruleType &&
-        Objects.equals(transitionKey, that.transitionKey);
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(ruleType, transitionKey);
-    }
-
-    @Override
-    public String toString() {
-      return "IssueChange{" +
-        "ruleType=" + ruleType +
-        ", transitionKey='" + transitionKey + '\'' +
-        '}';
-    }
-  }
 
   final class IssueChangeData {
     private final List<DefaultIssue> issues;
